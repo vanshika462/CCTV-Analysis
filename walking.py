@@ -39,7 +39,7 @@ def visualize_walking_model(video_path):
     cv2.destroyAllWindows()
 
 # Specify the path to your video file
-video_path = r'dummy_vids\ch4_20230824153939.mp4'
+video_path = r'dummy_vids\ch4_20230824164857.mp4'
 
 # Call the function to visualize the walking model
 visualize_walking_model(video_path)
