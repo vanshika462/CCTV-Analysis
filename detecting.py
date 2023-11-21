@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load YOLO model and class names
-net = cv2.dnn.readNet("darknet\yolov3.weights", "darknet\cfg\yolov3.cfg")
+net = cv2.dnn.readNet("C:\\Users\\WelCome\\CCTV-Analysis\\darknet\\yolov3.weights","C:\\Users\\WelCome\\CCTV-Analysis\\darknet\\cfg\\yolov3.cfg")
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
 
@@ -12,7 +12,7 @@ with open("darknet\data\coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 
 # Initialize video capture (use your video source or file)
-cap = cv2.VideoCapture('dummy_vids\ch4_20230824153939.mp4')
+cap = cv2.VideoCapture('dummy_vids\ch4_20230824164618.mp4')
 
 while True:
     # Read frames from a video
