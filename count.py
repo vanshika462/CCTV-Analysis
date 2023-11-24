@@ -10,7 +10,7 @@ with open("darknet\data\coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 
 # Read a single frame (replace 'your_frame_path.jpg' with the actual path)
-frame = cv2.imread('C:\\Users\\WelCome\\CCTV-Analysis\\frames\\ch4_20230824164618\\frame_0255.jpg')
+frame = cv2.imread('C:\\Users\\WelCome\\CCTV-Analysis\\frames\\ch4_20230824164618\\frame_0340.jpg')
 
 height, width, channels = frame.shape
 blob = cv2.dnn.blobFromImage(frame, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
@@ -69,8 +69,8 @@ for class_name, count in label_counts.items():
     if count > 0:
         print(f"{class_name}: {count} instances detected")
 
-# Display the processed frame
+# Create a window with the original frame size
+cv2.namedWindow("Object Detection", cv2.WINDOW_NORMAL)
 cv2.imshow("Object Detection", frame)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
