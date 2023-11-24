@@ -12,13 +12,16 @@ with open("darknet\data\coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 
 # Initialize video capture (use your video source or file)
-cap = cv2.VideoCapture('dummy_vids\ch4_20230824171855.mp4')
+cap = cv2.VideoCapture('dummy_vids\ch4_20230824153939.mp4')
 
 # Initialize a list to store person centroids and directions
 person_info = []
 
 # Define a file name to save the data
 output_file = "person_info.txt"
+
+# Create a resizable window
+cv2.namedWindow("Building Entry/Exit", cv2.WINDOW_NORMAL)
 
 while True:
     # Read frames from a video
@@ -72,8 +75,8 @@ while True:
             for person in person_info:
                 px, py, direction = person
                 distance = np.sqrt((px - centroid_x) ** 2 + (py - centroid_y) ** 2)
-                distance_threshold =  50
-                if distance < distance_threshold:  # You can adjust this distance threshold
+                distance_threshold = 50  # You can adjust this distance threshold
+                if distance < distance_threshold:
                     # Update the existing person's position
                     person[0] = centroid_x
                     person[1] = centroid_y
@@ -98,8 +101,8 @@ while True:
         for px, py, direction in person_info:
             f.write(f"Centroid: ({px}, {py}), Direction: {direction}\n")
 
-    # Display the processed frame
-    cv2.imshow("Building Entry/Exit", frame)
+    # Display the processed frame with the original aspect ratio
+    cv2.imshow("Building Entry/Exit", cv2.resize(frame, (800, 600)))
 
     # Press 'q' to exit
     if cv2.waitKey(1) & 0xFF == ord('q'):

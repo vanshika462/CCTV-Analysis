@@ -8,6 +8,14 @@ min_contour_area = 500
 
 def visualize_walking_model(video_path):
     cap = cv2.VideoCapture(video_path)
+    
+    # Get the original video dimensions
+    original_width = int(cap.get(3))
+    original_height = int(cap.get(4))
+
+    # Create a resizable window
+    cv2.namedWindow('Walking Model', cv2.WINDOW_NORMAL)
+    
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -30,8 +38,9 @@ def visualize_walking_model(video_path):
             centroid_y = int(M["m01"] / M["m00"])
             cv2.circle(frame_with_contours, (centroid_x, centroid_y), 5, (0, 0, 255), -1)
             
-        cv2.imshow('Walking Model', frame_with_contours)
-        
+        # Display the processed frame with the original aspect ratio
+        cv2.imshow('Walking Model', cv2.resize(frame_with_contours, (800, 600)))
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     

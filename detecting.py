@@ -14,6 +14,13 @@ with open("darknet\data\coco.names", "r") as f:
 # Initialize video capture (use your video source or file)
 cap = cv2.VideoCapture('dummy_vids\ch4_20230824164618.mp4')
 
+# Get the original video dimensions
+original_width = int(cap.get(3))
+original_height = int(cap.get(4))
+
+# Create a resizable window
+cv2.namedWindow("Vehicle Detection", cv2.WINDOW_NORMAL)
+
 while True:
     # Read frames from a video
     ret, frame = cap.read()
@@ -65,7 +72,7 @@ while True:
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             cv2.putText(frame, f"{label} {confidence:.2f}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-    # Display the processed frame
+    # Display the processed frame with the original aspect ratio
     cv2.imshow("Vehicle Detection", frame)
 
     # Press 'q' to exit
