@@ -75,8 +75,8 @@ detect_button.pack(pady=10)
 result_label = tk.Label(root, text="")
 result_label.pack(pady=10)
 
-# # Object count label
-# object_count_label = tk.Label(root, text="Object Count: ")
-# object_count_label.pack(pady=10)
+# Object count label
+object_count_label = tk.Label(root, text="Object Count: ")
+object_count_label.pack(pady=10)
 
 root.mainloop()
