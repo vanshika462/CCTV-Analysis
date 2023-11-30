@@ -1,1 +1,7 @@
+<<<<<<< HEAD
+=======
+# Ignore the "node_modules" folder
+dummy_vids/
+frames/
+>>>>>>> 98ccdf3bdee92ddae8791867d7bd0cc462aa8045
 darknet/
