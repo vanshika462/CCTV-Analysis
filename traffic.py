@@ -4,109 +4,65 @@ import csv
 import os
 
 def process_video(video_path, output_csv):
-    net = cv2.dnn.readNet("darknet\yolov3.weights", "darknet\cfg\yolov3.cfg")
-    layer_names = net.getLayerNames()
-    output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
-
-    classes = []
-    with open("darknet\data\coco.names", "r") as f:
-        classes = [line.strip() for line in f.readlines()]
-
     cap = cv2.VideoCapture(video_path)
+
+    if not cap.isOpened():
+        print(f"Error opening video file: {video_path}")
+        return
+
+    background_subtractor = cv2.createBackgroundSubtractorMOG2()
+
     person_info = {}
-    person_id_counter = 1  # Initialize a counter for assigning IDs
 
-    # Get the original video dimensions
-    original_width = int(cap.get(3))
-    original_height = int(cap.get(4))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 
-    # Create a resizable window
-    cv2.namedWindow('Building Entry/Exit', cv2.WINDOW_NORMAL)
+    # Open the CSV file in 'w' mode to write the header row
+    with open(output_csv, "w", newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(["Timestamp", "Person_ID", "Direction", "Centroid_X", "Centroid_Y"])
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
-        height, width, channels = frame.shape
-        blob = cv2.dnn.blobFromImage(frame, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
+        mask = background_subtractor.apply(frame)
 
-        net.setInput(blob)
-        outs = net.forward(output_layers)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        class_ids = []
-        confidences = []
-        boxes = []
+        if contours:
+            contour = contours[0]
+            x, y, w, h = cv2.boundingRect(contour)
+            px, py = x + w // 2, y + h // 2
 
-        for out in outs:
-            for detection in out:
-                scores = detection[5:]
-                class_id = np.argmax(scores)
-                confidence = scores[class_id]
-                if confidence > 0.5 and classes[class_id] == 'person':
-                    center_x = int(detection[0] * width)
-                    center_y = int(detection[1] * height)
-                    w = int(detection[2] * width)
-                    h = int(detection[3] * height)
-                    x = int(center_x - w / 2)
-                    y = int(center_y - h / 2)
-                    boxes.append([x, y, w, h])
-                    confidences.append(float(confidence))
+            person_id = 1
 
-        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+            if person_id not in person_info:
+                person_info[person_id] = {"direction": None, "last_entry_time": None}
 
-        for i in range(len(boxes)):
-            if i in indexes:
-                x, y, w, h = boxes[i]
-                centroid_x = x + w // 2
-                centroid_y = y + h // 2
-                person_key = None
+            if person_info[person_id]["last_entry_time"] is None:
+                timestamp = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0
 
-                for key, person in person_info.items():
-                    px, py, direction, person_id = person
-                    distance = np.sqrt((px - centroid_x) ** 2 + (py - centroid_y) ** 2)
-                    distance_threshold = 50  # You can adjust this distance threshold
-
-                    if distance < distance_threshold:
-                        person_key = key
-                        break
-
-                if person_key is None:
-                    person_info[person_id_counter] = [centroid_x, centroid_y, None, person_id_counter]
-                    person_id_counter += 1
-                else:
-                    person_info[person_key][0] = centroid_x
-                    person_info[person_key][1] = centroid_y
-
-        for key, person in list(person_info.items()):
-            px, py, direction, person_id = person
-            if direction is None:
-                if py < height // 2:
-                    person_info[key][2] = "standing"
-                elif px < width // 2:
-                    person_info[key][2] = "exiting"
-                else:
-                    person_info[key][2] = "entering"
-
-            if direction != person_info[key][2]:
-                # Only write to CSV if the direction changes
                 with open(output_csv, "a", newline='') as csvfile:
                     csv_writer = csv.writer(csvfile)
-                    if os.path.getsize(output_csv) == 0:  # Check if the file is empty
-                        csv_writer.writerow(["Person_ID", "Centroid_X", "Centroid_Y", "Direction"])
+                    csv_writer.writerow([timestamp, person_id, "standing", px, py])
 
-                    csv_writer.writerow([person_id, px, py, person_info[key][2]])
+                person_info[person_id]["last_entry_time"] = timestamp
 
-                person_info[key][2] = direction
+            else:
+                direction = "entering" if py > height // 2 else "exiting"
 
-        # Display the processed frame with the original aspect ratio
-        cv2.imshow('Building Entry/Exit', frame)
+                if direction != person_info[person_id]["direction"]:
+                    timestamp = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+                    with open(output_csv, "a", newline='') as csvfile:
+                        csv_writer = csv.writer(csvfile)
+                        csv_writer.writerow([timestamp, person_id, direction, px, py])
+
+                    person_info[person_id]["direction"] = direction
 
     cap.release()
-    cv2.destroyAllWindows()
 
 def process_videos(folder_path, output_folder):
     videos = [f for f in os.listdir(folder_path) if f.endswith(".mp4")]
@@ -114,9 +70,17 @@ def process_videos(folder_path, output_folder):
     for video in videos:
         video_path = os.path.join(folder_path, video)
         output_csv = os.path.join(output_folder, f"{os.path.splitext(video)[0]}_output.csv")
+
+        print(f"Processing video: {video}")
+        print(f"Output CSV: {output_csv}")
+
         process_video(video_path, output_csv)
 
 # Example usage for processing multiple videos in a folder
 videos_folder = "traffic_input"
 output_folder = "traffic_output"
+
+print(f"Videos folder: {videos_folder}")
+print(f"Output folder: {output_folder}")
+
 process_videos(videos_folder, output_folder)
