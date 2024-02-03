@@ -1,0 +1,2 @@
+Centroid: (425, 877), Direction: exiting
+Centroid: (232, 910), Direction: exiting

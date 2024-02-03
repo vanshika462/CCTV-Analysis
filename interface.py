@@ -3,6 +3,13 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import cv2
 from count import count_objects
+<<<<<<< Updated upstream
+=======
+from peak_hour import detect_peak_hour
+from loitering import detect_loitering
+from detecting import layer_names
+
+>>>>>>> Stashed changes
 
 # Placeholder function for activity detection using the model
 def detect_activity(input_path, activity_type):
@@ -31,12 +38,21 @@ def open_input():
 
         cap.release()
 
-# Function to perform activity detection based on the selected option
-def detect_selected_activity():
+# Function to perform loitering detection based on the selected option
+def loitering_in_input():
     if video_label.file_path:
-        selected_activity = activity_var.get()
-        result = detect_activity(video_label.file_path, selected_activity)
-        result_label.config(text=result)
+        exec(open('detecting.py').read())
+
+# Function to count objects in the video or frame
+def count_objects_in_input():
+    if video_label.file_path:
+        object_count = count_objects(video_label.file_path)
+        object_count_label.config(text=f"Object Count: {object_count}")
+
+# Function to find peak hour in the total videos
+def peak_hour_in_input():
+        peak_hour_result = detect_peak_hour()
+        peak_hour_label.config(text=f"Peak Hour: {peak_hour_result}")
 
 # Function to count objects in the video or frame
 def count_objects_in_input():
@@ -59,6 +75,7 @@ open_button.pack(pady=10)
 # Count Objects Button
 count_objects_button = tk.Button(root, text="Count Objects", command=count_objects_in_input)
 count_objects_button.pack(pady=10)
+<<<<<<< Updated upstream
 
 # Activity selection
 activities = ["Loitering", "Peak Hour Pedestrian Traffic", "Custom Activity"]
@@ -66,14 +83,29 @@ activity_var = tk.StringVar(root)
 activity_var.set(activities[0])  # Default activity
 activity_menu = tk.OptionMenu(root, activity_var, *activities)
 activity_menu.pack(pady=10)
+=======
+>>>>>>> Stashed changes
 
-# Detect Activity Button
-detect_button = tk.Button(root, text="Detect Activity", command=detect_selected_activity)
-detect_button.pack(pady=10)
+# Peak Hour Button
+peak_hour_button = tk.Button(root, text="Peak Hour", command=peak_hour_in_input)
+peak_hour_button.pack(pady=10)
 
-# Result label
-result_label = tk.Label(root, text="")
-result_label.pack(pady=10)
+#Loitering Button
+loitering_button = tk.Button(root, text="Detecting", command=loitering_in_input)
+loitering_button.pack(pady=10)
+
+# Object count label
+object_count_label = tk.Label(root, text="Object Count: ")
+object_count_label.pack(pady=10)
+
+# Peak hour label
+peak_hour_label = tk.Label(root, text="Peak Hour: ")
+peak_hour_label.pack(pady=10)
+
+# Loitering count label
+#loitering_count_label = tk.Label(root, text="Loitering Count: ")
+#loitering_count_label.pack(pady=10)
+
 
 # # Object count label
 # object_count_label = tk.Label(root, text="Object Count: ")

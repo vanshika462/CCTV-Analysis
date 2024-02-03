@@ -1,0 +1,6 @@
+Timestamp,Person_ID,Direction,Centroid_X,Centroid_Y
+0.0,1,standing,720,808
+0.1,1,exiting,727,159
+0.4,1,entering,1249,1615
+0.5,1,exiting,747,159
+0.6,1,entering,923,1150
