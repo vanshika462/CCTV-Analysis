@@ -1,5 +1,6 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, Label, filedialog
+from PIL import ImageFilter, ImageTk, Image
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame0")
@@ -14,12 +15,22 @@ def display_selected_frame():
     
     # If the user selected an image
     if file_path:
-        # Create a PhotoImage object from the selected image
-        selected_image = PhotoImage(file=file_path)
+        # Open the image using Pillow
+        original_image = Image.open(file_path)
         
-        # Create a Label widget and set the selected image
-        selected_label = Label(selected_frame, image=selected_image)
-        selected_label.image = selected_image
+        # Resize the image to fit within the 850x500 rectangle while maintaining aspect ratio
+        width, height = original_image.size
+        aspect_ratio = height / width
+        new_width = 850
+        new_height = int(new_width * aspect_ratio)
+        resized_image = original_image.resize((new_width, new_height), Image.BICUBIC)
+        
+        # Convert the resized image to a PhotoImage object
+        resized_photo = ImageTk.PhotoImage(resized_image)
+        
+        # Create a Label widget and set the resized image
+        selected_label = Label(selected_frame, image=resized_photo)
+        selected_label.image = resized_photo
         selected_label.pack()
 
 window = Tk()
