@@ -58,7 +58,7 @@ canvas.create_text(
     13.0,
     20.0,
     anchor="nw",
-    text="         Count",
+    text="        Count",
     fill="#FFFFFF",
     font=("Inter ExtraLight", 28)
 )
@@ -71,7 +71,8 @@ button_1 = Button(
     highlightthickness=0,
     command=display_selected_frame,
     #command=lambda: print("button_1 clicked"),
-    relief="flat"
+    relief="flat",
+    bg="#B3A3B3" 
 )
 button_1.place(
     x=21.0,
@@ -79,6 +80,31 @@ button_1.place(
     width=246.1466827392578,
     height=59.61457443237305
 )
+
+button_image_2 = PhotoImage(
+    file=relative_to_assets("button_2.png"))
+button_2 = Button(
+    image=button_image_2,
+    borderwidth=0,
+    highlightthickness=0,
+    command=lambda: print("button_2 clicked"),
+    relief="flat",
+    bg="#A799AC" 
+)
+button_2.place(
+    x=21.0,
+    y=200.0,
+    width=246.1466827392578,
+    height=59.61457443237305
+)
+
+canvas.create_rectangle(
+    36.0,
+    290.0,
+    257.0,
+    630.0,
+    fill="#BBAAB8",
+    outline="")
 
 canvas.create_rectangle(
     285.0,
