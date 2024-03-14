@@ -25,7 +25,7 @@ def display_selected_frame():
         # Open the image using Pillow
         original_image = Image.open(file_path)
         object_count = count.count_objects(file_path)
-        print(f'The frame has {object_count} objects.')
+        print(f'The frame has {object_count} vehicles w.r.t area coverage.')
         
         # Resize the image to fit within the 850x500 rectangle while maintaining aspect ratio
         width, height = original_image.size
