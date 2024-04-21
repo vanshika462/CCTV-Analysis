@@ -149,4 +149,3 @@ selected_frame.pack(side="right", padx=20, pady=20)
 
 window.resizable(False, False)
 window.mainloop()
-
