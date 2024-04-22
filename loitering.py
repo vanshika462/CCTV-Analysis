@@ -1,87 +1,72 @@
-import torch
 import cv2
-import time
+import torch
 from pathlib import Path
+import time
 from yolov5.models.experimental import attempt_load
-from yolov5.utils.general import check_img_size, non_max_suppression, scale_coords
 from yolov5.utils.augmentations import letterbox
+from yolov5.utils.general import non_max_suppression, scale_coords
 from yolov5.utils.plots import plot_one_box
-from yolov5.utils.torch_utils import select_device, time_sync
 
-def detect(source, weights, img_size=640, conf_thres=0.25, iou_thres=0.45, output_dir="output"):
-    source = str(Path(source))  # convert to str
-    # Initialize
-    device = select_device('')
-    half = device.type != 'cpu'  # half precision only supported on CUDA
+# Load YOLOv5 model
+weights = 'yolov5s.pt'  # Or other YOLOv5 weights file
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+model = attempt_load(weights, map_location=device)
 
-    # Load model
-    model = attempt_load(weights, map_location=device)  # load FP32 model
-    imgsz = check_img_size(img_size, s=model.stride.max())  # check img_size
+# Set video input
+video_path = 'dummy_vids\ch4_20230824151107.mp4'
+cap = cv2.VideoCapture(video_path)
 
-    # Set Dataloader
-    vid_path, vid_writer = None, None
+# Set parameters
+loitering_time_threshold = 10  # Time threshold in seconds
+person_id = 0  # Class ID for person detection in YOLOv5
 
-    # Run inference
-    if device.type != 'cpu':
-        model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
+# Initialize variables
+start_time = None
+loitering_detected = False
 
-    cap = cv2.VideoCapture(source)
-    frames = 0
-    start_time = time.time()
-    loitering_time = 0
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-        frames += 1
+    # Perform detection
+    img = letterbox(frame, new_shape=model.img_size)[0]
+    img = img[:, :, ::-1].transpose(2, 0, 1)
+    img = torch.from_numpy(img).to(device)
+    img /= 255.0
+    if img.ndimension() == 3:
+        img = img.unsqueeze(0)
 
-        img = letterbox(frame, imgsz, stride=model.stride)[0]
-        img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
-        img = torch.from_numpy(img).to(device)
-        img = img.half() if half else img.float()  # uint8 to fp16/32
-        img /= 255.0  # 0 - 255 to 0.0 - 1.0
-        if img.ndimension() == 3:
-            img = img.unsqueeze(0)
+    # Inference
+    pred = model(img)[0]
 
-        # Inference
-        t1 = time_sync()
-        pred = model(img, augment=False)[0]
+    # Apply NMS
+    pred = non_max_suppression(pred, 0.4, 0.5)
 
-        # Apply NMS
-        pred = non_max_suppression(pred, conf_thres, iou_thres, classes=None, agnostic=False)
-        t2 = time_sync()
-        loitering = False
+    for det in pred[0]:
+        if det is not None and det[-1] == person_id:
+            bbox = det[:4].cpu().numpy()
+            bbox = scale_coords(img.shape[2:], bbox, frame.shape).astype(int)
+            x1, y1, x2, y2 = bbox
 
-        # Process detections
-        for i, det in enumerate(pred):  # detections per image
-            if len(det):
-                det[:, :4] = scale_coords(img.shape[2:], det[:, :4], frame.shape).round()
-                for *xyxy, conf, cls in reversed(det):
-                    label = '%s %.2f' % ('person', conf)
-                    plot_one_box(xyxy, frame, label=label, color=(0, 255, 0), line_thickness=3)
+            # Draw bounding box
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-                    # Check if person is loitering
-                    if cls == 0:
-                        loitering_time = time.time() - start_time
-                        if loitering_time > 180:  # 3 minutes
-                            loitering = True
-                            # Change bounding box color to pink
-                            plot_one_box(xyxy, frame, label=label, color=(255, 0, 255), line_thickness=3)
-                            cv2.putText(frame, "Loitering", (int(xyxy[0]), int(xyxy[1] - 5)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+            # Track time spent in frame
+            if start_time is None:
+                start_time = time.time()
+            else:
+                elapsed_time = time.time() - start_time
+                if elapsed_time >= loitering_time_threshold:
+                    loitering_detected = True
+                    # Trigger alert or take action
 
-        # Save annotated frame
-        output_path = Path(output_dir) / f"output_frame_{frames}.jpg"
-        cv2.imwrite(str(output_path), frame)
+    if loitering_detected:
+        cv2.putText(frame, "Loitering Detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-        if loitering:
-            break
+    cv2.imshow('Frame', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-    cap.release()
-    cv2.destroyAllWindows()
-
-    return str(output_path)  # Return the path to the saved output image
-
-# Example usage:
-# output_image_path = detect("input_video.mp4", "yolov5s.pt", output_dir="output")
-# print("Output image saved to:", output_image_path)
+cap.release()
+cv2.destroyAllWindows()

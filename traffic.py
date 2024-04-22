@@ -2,9 +2,25 @@ import cv2
 import numpy as np
 import csv
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
 
-def process_video(video_path, output_csv):
+# Function to analyze a single CSV file
+def analyze_single_file(file_path):
+    # Read CSV file into a DataFrame
+    df = pd.read_csv(file_path)
+
+    # Count the number of people entering, standing, and exiting
+    entering_count = df[df['Direction'] == 'entering'].shape[0]
+    standing_count = df[df['Direction'] == 'standing'].shape[0]
+    exiting_count = df[df['Direction'] == 'exiting'].shape[0]
+
+    return entering_count, standing_count, exiting_count
+
+
+def process_video(video_path):
     cap = cv2.VideoCapture(video_path)
+    output_folder = "traffic_output"
 
     if not cap.isOpened():
         print(f"Error opening video file: {video_path}")
@@ -16,6 +32,9 @@ def process_video(video_path, output_csv):
 
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+
+    video_name = os.path.splitext(os.path.basename(video_path))[0]
+    output_csv = os.path.join(output_folder, f"{video_name}.csv")
 
     # Open the CSV file in 'w' mode to write the header row
     with open(output_csv, "w", newline='') as csvfile:
@@ -64,23 +83,6 @@ def process_video(video_path, output_csv):
 
     cap.release()
 
-def process_videos(folder_path, output_folder):
-    videos = [f for f in os.listdir(folder_path) if f.endswith(".mp4")]
+    entering_count, standing_count, exiting_count = analyze_single_file(output_csv)
+    return entering_count, standing_count, exiting_count
 
-    for video in videos:
-        video_path = os.path.join(folder_path, video)
-        output_csv = os.path.join(output_folder, f"{os.path.splitext(video)[0]}_output.csv")
-
-        print(f"Processing video: {video}")
-        print(f"Output CSV: {output_csv}")
-
-        process_video(video_path, output_csv)
-
-# Example usage for processing multiple videos in a folder
-videos_folder = "traffic_input"
-output_folder = "traffic_output"
-
-print(f"Videos folder: {videos_folder}")
-print(f"Output folder: {output_folder}")
-
-process_videos(videos_folder, output_folder)
