@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Function to read and concatenate CSV files from a folder
 def read_csv_files(folder_path):
@@ -13,38 +12,11 @@ def read_csv_files(folder_path):
             dfs.append(df)
     return pd.concat(dfs, ignore_index=True)
 
-# Function to create visualizations
-def create_movement_visualizations(df):
-    plt.figure(figsize=(14, 8))
-
-    # Print column names for inspection
-    print("Column Names:", df.columns)
-
-    # Plotting Timestamp vs Centroid_X and Centroid_Y
-    plt.subplot(2, 2, 1)
-    sns.lineplot(x='Timestamp', y='Centroid_X', data=df, label='Centroid_X')
-    sns.lineplot(x='Timestamp', y='Centroid_Y', data=df, label='Centroid_Y')
-    plt.title('Centroid_X and Centroid_Y over Time')
-    plt.xlabel('Timestamp')
-    plt.ylabel('Centroid')
-
-    # Plotting Direction over Time
-    plt.subplot(2, 2, 2)
-    sns.lineplot(x='Timestamp', y='Direction', data=df)
-    plt.title('Direction over Time')
-    plt.xlabel('Timestamp')
-    plt.ylabel('Direction')
-
-    # Scatter plot of Centroid_X vs Centroid_Y
-    plt.subplot(2, 2, 3)
-    sns.scatterplot(x='Centroid_X', y='Centroid_Y', data=df, hue='Direction')
-    plt.title('Scatter Plot of Centroid_X vs Centroid_Y')
-    plt.xlabel('Centroid_X')
-    plt.ylabel('Centroid_Y')
-    plt.legend()
-
-    plt.tight_layout()
-    plt.show()
+# Function to count entering and exiting people
+def count_entering_exiting_people(df):
+    # Group by timestamp and count the number of entries for each direction
+    counts = df.groupby(['Timestamp', 'Direction']).size().unstack(fill_value=0)
+    return counts
 
 # Specify the folder containing CSV files
 input_folder = 'traffic_output'
@@ -52,5 +24,29 @@ input_folder = 'traffic_output'
 # Read CSV files into a DataFrame
 data = read_csv_files(input_folder)
 
-# Create visualizations
-create_movement_visualizations(data)
+# Count entering and exiting people
+counts = count_entering_exiting_people(data)
+
+# Plotting
+plt.figure(figsize=(10, 6))
+
+# Plot entering people
+plt.plot(counts.index, counts['entering'], label='Entering', marker='o')
+
+# Plot exiting people
+plt.plot(counts.index, counts['exiting'], label='Exiting', marker='o')
+
+plt.title('Count of Entering and Exiting People over Time')
+plt.xlabel('Timestamp')
+plt.ylabel('Count')
+plt.legend()
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.tight_layout()
+
+# Save the plot as an image
+output_path = r'C:\Users\vansh\Desktop\Projects\CCTV-Analysis\interface\assets\frame0'
+os.makedirs(output_path, exist_ok=True)  # Create the directory if it doesn't exist
+plt.savefig(os.path.join(output_path, 'traffic_plot.png'))
+
+plt.show()
