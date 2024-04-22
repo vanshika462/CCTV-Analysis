@@ -1,6 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, Label, filedialog
 from PIL import ImageFilter, ImageTk, Image
+import count
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame0")
@@ -12,18 +13,26 @@ def display_selected_frame():
     # Function to be called when the "Select" button is clicked
     # Open a file dialog to let the user select an image
     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.gif")])
+
+    # if file_path:
+    #     # Call the count_objects function from count.py
+    #     object_count = count.count_objects(file_path)
+    #     print(f'The frame has {object_count} objects.')
+
     
     # If the user selected an image
     if file_path:
         # Open the image using Pillow
         original_image = Image.open(file_path)
+        object_count = count.count_objects(file_path)
+        print(f'The frame has {object_count} vehicles w.r.t area coverage.')
         
         # Resize the image to fit within the 850x500 rectangle while maintaining aspect ratio
         width, height = original_image.size
         aspect_ratio = height / width
         new_width = 850
-        new_height = int(new_width * aspect_ratio)
-        resized_image = original_image.resize((new_width, new_height), Image.BICUBIC)
+        new_height = 500
+        resized_image = original_image.resize((new_width, new_height))  
         
         # Convert the resized image to a PhotoImage object
         resized_photo = ImageTk.PhotoImage(resized_image)
