@@ -21,7 +21,48 @@ def play_video():
     if not file_path:
         return
 
-    subprocess.Popen(["python", "loitering.py", "--video_path", file_path])
+    subprocess.Popen(["python", "try.py", "--video_path", file_path])
+
+    def update_video():
+        ret, frame = cap.read()
+        if ret:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = cv2.resize(frame, (width, height))
+            photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
+            canvas.itemconfig(video_image, image=photo)
+            canvas.image = photo  # To prevent garbage collection
+            canvas.after(10, update_video)  # Update video every 10 milliseconds
+        else:
+            cap.release()
+
+    cap = cv2.VideoCapture(file_path)
+    width, height = 441, 291  # Dimensions of image_1
+    x, y = 235.0, 18.0  # Coordinates of image_1
+    canvas.delete("video")  # Delete any existing video
+    ret, frame = cap.read()
+    if ret:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.resize(frame, (width, height))
+        photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
+        video_image = canvas.create_image(
+            x,  # Set x coordinate to the same as image_1
+            y,  # Set y coordinate to the same as image_1
+            anchor=tk.NW,  # Anchor at the top-left corner
+            image=photo,
+            tags="video"
+        )
+        canvas.image = photo  # To prevent garbage collection
+        update_video()  # Start updating the video frames
+
+def play_output():
+    # Display the output from loitering.py in place of image 2
+    # Placeholder code to display a sample image
+    image_path = relative_to_assets("sample_output_image.png")
+    image = Image.open(image_path)
+    image = image.resize((width, height), Image.ANTIALIAS)
+    photo = ImageTk.PhotoImage(image=image)
+    canvas.itemconfig(image_2, image=photo)
+    canvas.image = photo  # To prevent garbage collection
 
 window = tk.Tk()
 
@@ -62,7 +103,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=play_video,  # Change command to call play_video function
+    command=play_output, # Change command to call play_video function
     relief="flat"
 )
 button_1.place(
@@ -78,7 +119,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_2 clicked"),  # Placeholder command
+    command=play_video,  # Placeholder command
     relief="flat"
 )
 button_2.place(

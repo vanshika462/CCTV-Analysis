@@ -8,13 +8,13 @@ ASSETS_PATH = OUTPUT_PATH / Path("assets/frame0")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-# def open_script_4():
-#     window.destroy()  # Close the current window
-#     subprocess.run(["python", str(OUTPUT_PATH / "script_for_button_4.py")])  # Adjust the file name as needed
+def open_script_4():
+    window.destroy()  # Close the current window
+    subprocess.run(["python", str(OUTPUT_PATH / "gui_patterns.py")])  # Adjust the file name as needed
 
-# def open_script_5():
-#     window.destroy()
-#     subprocess.run(["python", str(OUTPUT_PATH / "script_for_button_5.py")])  # Adjust the file name as needed
+def open_script_5():
+    window.destroy()
+    subprocess.run(["python", str(OUTPUT_PATH / "gui_loitering.py")])  # Adjust the file name as needed
 
 def open_script_6():
     window.destroy()
@@ -41,7 +41,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    # command=open_script_4,
+    command=open_script_4,
     relief="flat"
 )
 button_1.place(x=910.0, y=339.0, width=281.0, height=95.02040100097656)
@@ -51,7 +51,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    # command=open_script_5,
+    command=open_script_5,
     relief="flat"
 )
 button_2.place(x=453.0, y=464.0, width=305.0, height=84.0)

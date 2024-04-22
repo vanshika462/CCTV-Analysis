@@ -5,7 +5,7 @@ from pathlib import Path
 import cv2
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\vansh\Desktop\Projects\CCTV-Analysis\assets\frame1.2")
+ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\vansh\Desktop\Projects\CCTV-Analysis\assets\frame1")
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -101,7 +101,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
+    command=display_traffic_plot,
     relief="flat"
 )
 button_1.place(
@@ -116,7 +116,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=display_traffic_plot,
+    command=lambda: print("button_2 clicked"),
     relief="flat"
 )
 button_2.place(

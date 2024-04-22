@@ -50,11 +50,7 @@ import cv2
 import numpy as np
 
 def count_objects(video_path):
-<<<<<<< Updated upstream
-    net = cv2.dnn.readNet("C:\\Users\\WelCome\\CCTV-Analysis\\darknet\\yolov3.weights", "C:\\Users\\WelCome\\CCTV-Analysis\\darknet\\cfg\\yolov3.cfg")
-=======
     net = cv2.dnn.readNet("darknet\yolov3.weights", "darknet\cfg\yolov3.cfg")
->>>>>>> Stashed changes
     layer_names = net.getLayerNames()
     output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
 
@@ -95,8 +91,4 @@ def count_objects(video_path):
     cap.release()
     cv2.destroyAllWindows()
 
-<<<<<<< Updated upstream
     return object_count
-=======
-    return object_count
->>>>>>> Stashed changes
