@@ -42,9 +42,27 @@ def display_selected_frame():
         selected_label.image = resized_photo
         selected_label.pack()
 
-        # Create a label to display the result
-        result_label = Label(selected_frame, text=f'The frame has {object_count} objects.', font=("Inter ExtraLight", 15), bg="#BBAAB8", fg="#FFFFFF")
-        result_label.place(x=-0, y=30)
+        # # Create a label to display the result
+        # result_label = Label(selected_frame, text=f'The frame has {object_count} objects.', font=("Inter ExtraLight", 15), bg="#BBAAB8", fg="#FFFFFF")
+        # result_label.place(x=-0, y=30)
+
+        canvas.create_text(
+        150.0,  # Set x coordinate
+        320.0,  # Set y coordinate for entering count
+        # anchor=tk.CENTER,
+        text=f"The frame has {object_count} vehicles",
+        fill="#292643",
+        font=("LaoSansPro", 12)
+        )
+
+        canvas.create_text(
+        150.0,  # Set x coordinate
+        340.0,  # Set y coordinate for entering count
+        # anchor=tk.CENTER,
+        text=f"w.r.t area coverage",
+        fill="#292643",
+        font=("LaoSansPro", 12)
+        )
 
 window = Tk()
 
