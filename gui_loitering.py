@@ -7,7 +7,7 @@ import subprocess
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"C:\Users\vansh\Desktop\Projects\CCTV-Analysis\assets\frame2")
+ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame2")
 
 
 def relative_to_assets(path: str) -> Path:

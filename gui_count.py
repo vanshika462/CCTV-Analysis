@@ -42,6 +42,10 @@ def display_selected_frame():
         selected_label.image = resized_photo
         selected_label.pack()
 
+        # Create a label to display the result
+        result_label = Label(selected_frame, text=f'The frame has {object_count} objects.', font=("Inter ExtraLight", 15), bg="#BBAAB8", fg="#FFFFFF")
+        result_label.place(x=-0, y=30)
+
 window = Tk()
 
 window.geometry("1175x759")
@@ -117,6 +121,7 @@ button_2.place(
     width=246.1466827392578,
     height=59.61457443237305
 )
+
 
 canvas.create_rectangle(
     36.0,
