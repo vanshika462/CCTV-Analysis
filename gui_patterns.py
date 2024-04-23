@@ -3,6 +3,7 @@ from tkinter import Canvas, Button, PhotoImage, filedialog
 from PIL import Image, ImageTk
 from pathlib import Path
 import cv2
+from traffic import *
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame1")
@@ -11,11 +12,15 @@ def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 cap = None  # Global variable to hold the video capture object
+video_path = None  # Global variable to hold the selected video path
+entering_count = None
+standing_count = None
+exiting_count = None
 
 def play_video():
-    global cap
-    file_path = filedialog.askopenfilename(filetypes=[("Video Files", "*.mp4;*.avi")])
-    if not file_path:
+    global cap, video_path
+    video_path = filedialog.askopenfilename(filetypes=[("Video Files", "*.mp4;*.avi")])
+    if not video_path:
         return
 
     def update_video():
@@ -30,7 +35,7 @@ def play_video():
         else:
             cap.release()
 
-    cap = cv2.VideoCapture(file_path)
+    cap = cv2.VideoCapture(video_path)
     width, height = 441, 291  # Dimensions of image_1
     x, y = 235.0, 18.0  # Coordinates of image_1
     canvas.delete("video")  # Delete any existing video
@@ -49,29 +54,65 @@ def play_video():
         canvas.image = photo  # To prevent garbage collection
         update_video()  # Start updating the video frames
 
-def display_traffic_plot():
-    # Load the traffic plot image
-    plot_path = ASSETS_PATH / "traffic_plot.png"
-    plot_image = Image.open(plot_path)
+def find_patterns():
+    global video_path,entering_count,standing_count,exiting_count
+    if video_path:
+        entering_count, standing_count, exiting_count=process_video(video_path)
+    else:
+        print("No video selected.")
 
-    # Resize the plot image to match the size of image_2
-    target_width = 455
-    target_height = 163
-    plot_image = plot_image.resize((target_width, target_height))
-    # Display the plot image in place of image_2
+def display_traffic_counts():
+    global standing_count, exiting_count, entering_count
+
+    # Load the traffic plot image as the background
+    plot_path = ASSETS_PATH / "image_2.png"
+    plot_image = Image.open(plot_path)
     photo = ImageTk.PhotoImage(plot_image)
+
+    # Display the image as the background
     canvas.delete("video")  # Delete any existing video
     canvas.create_image(
-        350.0,  # Set x coordinate to the same as image_2
-        428.0,  # Set y coordinate to the same as image_2
+        350.0,  # Set x coordinate
+        428.0,  # Set y coordinate
         anchor=tk.CENTER,
         image=photo,
         tags="image_2"
     )
     canvas.image = photo  # To prevent garbage collection
 
+    # Text for entering count
+    canvas.create_text(
+        350.0,  # Set x coordinate
+        390.0,  # Set y coordinate for entering count
+        anchor=tk.CENTER,
+        text=f"Entering count: {entering_count}",
+        fill="#292643",
+        font=("LaoSansPro", 12)
+    )
+
+    # Text for standing count
+    canvas.create_text(
+        350.0,  # Set x coordinate
+        410.0,  # Set y coordinate for standing count
+        anchor=tk.CENTER,
+        text=f"Standing count: {standing_count}",
+        fill="#292643",
+        font=("LaoSansPro", 12)
+    )
+
+    # Text for exiting count
+    canvas.create_text(
+        350.0,  # Set x coordinate
+        430.0,  # Set y coordinate for exiting count
+        anchor=tk.CENTER,
+        text=f"Exiting count: {exiting_count}",
+        fill="#292643",
+        font=("LaoSansPro", 12)
+    )
+
     # Stop video if it's playing
     stop_video()
+
 
 window = tk.Tk()
 
@@ -96,12 +137,20 @@ image_1 = canvas.create_image(
     image=image_image_1
 )
 
+image_image_2 = PhotoImage(
+    file=relative_to_assets("image_2.png"))
+image_2 = canvas.create_image(
+    350.0,
+    428.0,
+    image=image_image_2
+)
+
 button_image_1 = PhotoImage(file=relative_to_assets("button_1.png"))
 button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=display_traffic_plot,
+    command=display_traffic_counts,
     relief="flat"
 )
 button_1.place(
@@ -116,7 +165,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
+    command=find_patterns,
     relief="flat"
 )
 button_2.place(
