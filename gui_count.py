@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, Label, filedialog
 from PIL import ImageFilter, ImageTk, Image
@@ -8,6 +9,10 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame0")
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+
+def open_script_1():
+    window.destroy()  # Close the current window
+    subprocess.run(["python", str(OUTPUT_PATH / "menu_gui.py")])  # Adjust the file name as needed
 
 def display_selected_frame():
     # Function to be called when the "Select" button is clicked
@@ -140,6 +145,23 @@ button_2.place(
     height=59.61457443237305
 )
 
+button_image_3 = PhotoImage(
+    file=relative_to_assets("back_button.png"))
+button_3 = Button(
+    image=button_image_3,
+    borderwidth=0,
+    highlightthickness=0,
+    command=open_script_1,
+    relief="flat",
+    bg="#A799AC" 
+)
+button_3.config(width=20, height=20)  # Set the width and height to a smaller value
+button_3.place(
+    x=1150,  # Move the button to the top right corner
+    y=10,
+    width=20,
+    height=20
+)
 
 canvas.create_rectangle(
     36.0,
