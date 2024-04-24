@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, Label, filedialog
 from PIL import ImageFilter, ImageTk, Image
@@ -8,6 +9,10 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame0")
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+
+def open_script_1():
+    window.destroy()  # Close the current window
+    subprocess.run(["python", str(OUTPUT_PATH / "menu_gui.py")])  # Adjust the file name as needed
 
 def display_selected_frame():
     # Function to be called when the "Select" button is clicked
@@ -41,6 +46,28 @@ def display_selected_frame():
         selected_label = Label(selected_frame, image=resized_photo)
         selected_label.image = resized_photo
         selected_label.pack()
+
+        # # Create a label to display the result
+        # result_label = Label(selected_frame, text=f'The frame has {object_count} objects.', font=("Inter ExtraLight", 15), bg="#BBAAB8", fg="#FFFFFF")
+        # result_label.place(x=-0, y=30)
+
+        canvas.create_text(
+        150.0,  # Set x coordinate
+        320.0,  # Set y coordinate for entering count
+        # anchor=tk.CENTER,
+        text=f"The frame has {object_count} vehicles",
+        fill="#292643",
+        font=("LaoSansPro", 12)
+        )
+
+        canvas.create_text(
+        150.0,  # Set x coordinate
+        340.0,  # Set y coordinate for entering count
+        # anchor=tk.CENTER,
+        text=f"w.r.t area coverage",
+        fill="#292643",
+        font=("LaoSansPro", 12)
+        )
 
 window = Tk()
 
@@ -116,6 +143,24 @@ button_2.place(
     y=200.0,
     width=246.1466827392578,
     height=59.61457443237305
+)
+
+button_image_3 = PhotoImage(
+    file=relative_to_assets("back_button.png"))
+button_3 = Button(
+    image=button_image_3,
+    borderwidth=0,
+    highlightthickness=0,
+    command=open_script_1,
+    relief="flat",
+    bg="#A799AC" 
+)
+button_3.config(width=20, height=20)  # Set the width and height to a smaller value
+button_3.place(
+    x=1150,  # Move the button to the top right corner
+    y=10,
+    width=20,
+    height=20
 )
 
 canvas.create_rectangle(
