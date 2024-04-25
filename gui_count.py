@@ -18,12 +18,6 @@ def display_selected_frame():
     # Function to be called when the "Select" button is clicked
     # Open a file dialog to let the user select an image
     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.gif")])
-
-    # if file_path:
-    #     # Call the count_objects function from count.py
-    #     object_count = count.count_objects(file_path)
-    #     print(f'The frame has {object_count} objects.')
-
     
     # If the user selected an image
     if file_path:
