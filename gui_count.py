@@ -6,7 +6,7 @@ import count
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame0")
-
+file_path = None
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
@@ -14,18 +14,13 @@ def open_script_1():
     window.destroy()  # Close the current window
     subprocess.run(["python", str(OUTPUT_PATH / "menu_gui.py")])  # Adjust the file name as needed
 
-def display_selected_frame():
-    # Function to be called when the "Select" button is clicked
-    # Open a file dialog to let the user select an image
+
+def display_frame():
+    # Display the frame
+    global file_path
     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png;*.gif")])
-    
-    # If the user selected an image
     if file_path:
-        # Open the image using Pillow
         original_image = Image.open(file_path)
-        object_count = count.count_objects(file_path)
-        print(f'The frame has {object_count} vehicles w.r.t area coverage.')
-        
         # Resize the image to fit within the 850x500 rectangle while maintaining aspect ratio
         width, height = original_image.size
         aspect_ratio = height / width
@@ -44,6 +39,15 @@ def display_selected_frame():
         # # Create a label to display the result
         # result_label = Label(selected_frame, text=f'The frame has {object_count} objects.', font=("Inter ExtraLight", 15), bg="#BBAAB8", fg="#FFFFFF")
         # result_label.place(x=-0, y=30)
+
+
+def process_frame():
+    global file_path
+    if file_path:
+        # Open the image using Pillow
+        object_count = count.count_objects(file_path)
+        print(f'The frame has {object_count} vehicles w.r.t area coverage.')
+        
 
         canvas.create_text(
         150.0,  # Set x coordinate
@@ -110,8 +114,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=display_selected_frame,
-    #command=lambda: print("button_1 clicked"),
+    command=display_frame,
     relief="flat",
     bg="#B3A3B3" 
 )
@@ -128,7 +131,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
+    command=process_frame,
     relief="flat",
     bg="#A799AC" 
 )
@@ -188,3 +191,4 @@ selected_frame.pack(side="right", padx=20, pady=20)
 
 window.resizable(False, False)
 window.mainloop()
+
