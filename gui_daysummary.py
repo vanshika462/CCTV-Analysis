@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import subprocess
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -14,6 +14,11 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame3")
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+
+def open_script_1():
+    window.destroy()  # Close the current window
+    subprocess.run(["python", str(OUTPUT_PATH / "menu_gui.py")])  # Adjust the file name as needed
+
 
 selected_date = None
 
@@ -134,6 +139,24 @@ button_2.place(
     y=121.0,
     width=165.0,
     height=68.0
+)
+
+button_image_3 = PhotoImage(
+    file=relative_to_assets("back_button.png"))
+button_3= Button(
+    image=button_image_3,
+    borderwidth=0,
+    highlightthickness=0,
+    command=open_script_1,
+    relief="flat",
+    bg="#A799AC" 
+)
+button_3.config(width=20, height=20)  # Set the width and height to a smaller value
+button_3.place(
+    x=679,  
+    y=4,
+    width=15,
+    height=15
 )
 
 canvas.create_text(
