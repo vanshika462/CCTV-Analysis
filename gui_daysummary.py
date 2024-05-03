@@ -39,7 +39,7 @@ def get_selected_date(cal,window):
     messagebox.showinfo("Selected Date", f"You selected: {selected_date}")
     window.destroy()
 
-def display_traffic_plot():
+def display_traffic_plot_etc():
     global selected_date
     
     # Construct the file name based on the selected date
@@ -50,22 +50,33 @@ def display_traffic_plot():
         # Load the traffic plot image
         plot_image = Image.open(plot_path)
         
-        # Resize the plot image to match the size of image_2
-        target_width = 455
-        target_height = 163
+        # Resize the plot image to match the size of image_1
+        target_width = 441
+        target_height = 291
         plot_image = plot_image.resize((target_width, target_height))
         
         # Display the plot image in place of image_2
         photo = ImageTk.PhotoImage(plot_image)
-        canvas.delete("image_2")  # Delete any existing image_2
+        canvas.delete("image_1")  # Delete any existing image_2
         canvas.create_image(
+            455.0,
+            163.0,
+            anchor=tk.CENTER,
+            image=photo,
+            tags="image_1"
+        )
+        canvas.image = photo  # To prevent garbage collection
+        photo = ImageTk.PhotoImage(plot_image)
+        canvas.delete("text_2")  # Delete any existing text_1
+        canvas.create_text(
             350.0,  # Set x coordinate
             428.0,  # Set y coordinate
             anchor=tk.CENTER,
-            image=photo,
-            tags="image_2"
+            text="Number of People in Building = 36 and Peak Time = 17:00-17:30",
+            fill="#292643",
+            font=("LaoSansPro", 20 * -1),
+            tags="text_2"
         )
-        canvas.image = photo  # To prevent garbage collection
         
     except FileNotFoundError:
         # Handle the case when the file for the selected date does not exist
@@ -88,6 +99,8 @@ canvas = Canvas(
 )
 
 canvas.place(x = 0, y = 0)
+
+# Create text for the number of people in the building
 image_image_1 = PhotoImage(
     file=relative_to_assets("image_1.png"))
 image_1 = canvas.create_image(
@@ -110,7 +123,7 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=display_traffic_plot,
+    command=display_traffic_plot_etc,
     relief="flat"
 )
 button_1.place(

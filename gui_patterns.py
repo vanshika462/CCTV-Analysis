@@ -1,5 +1,5 @@
 import subprocess
-import tkinter as tk
+import tkinter as MovementPatterns
 from tkinter import Canvas, Button, PhotoImage, filedialog
 from PIL import Image, ImageTk
 from pathlib import Path
@@ -58,7 +58,7 @@ def play_video():
         video_image = canvas.create_image(
             x,  # Set x coordinate to the same as image_1
             y,  # Set y coordinate to the same as image_1
-            anchor=tk.NW,  # Anchor at the top-left corner
+            anchor=MovementPatterns.NW,  # Anchor at the top-left corner
             image=photo,
             tags="video"
         )
@@ -74,7 +74,7 @@ def find_patterns_and_display_csv():
         # Extract the base name of the video file
         video_name = os.path.splitext(os.path.basename(video_path))[0]
         # Construct the CSV file path with the same name as the video file
-        csv_file_path = f"traffic_output/{video_name}.csv"
+        csv_file_path = f"traffic_output/Aug23/{video_name}.csv"
         # Update image_2 frame with CSV content
         if os.path.exists(csv_file_path):
             # Find counts
@@ -102,7 +102,7 @@ def display_csv_content():
     canvas.create_image(
         350.0,  # Set x coordinate
         428.0,  # Set y coordinate
-        anchor=tk.CENTER,
+        anchor=MovementPatterns.CENTER,
         image=photo,
         tags="count_text"
     )
@@ -112,7 +112,7 @@ def display_csv_content():
     canvas.create_text(
         350.0,  # Set x coordinate
         400.0,  # Set y coordinate for CSV content
-        anchor=tk.CENTER,
+        anchor=MovementPatterns.CENTER,
         text=csv_content,
         fill="#292643",
         font=("LaoSansPro", 12),
@@ -129,7 +129,7 @@ def display_traffic_counts():
     canvas.create_text(
         350.0,  # Set x coordinate
         390.0,  # Set y coordinate for entering count
-        anchor=tk.CENTER,
+        anchor=MovementPatterns.CENTER,
         text=f"Entering count: {entering_count}",
         fill="#292643",
         font=("LaoSansPro", 12),
@@ -140,8 +140,8 @@ def display_traffic_counts():
     canvas.create_text(
         350.0,  # Set x coordinate
         410.0,  # Set y coordinate for standing count
-        anchor=tk.CENTER,
-        text=f"Standing count: {standing_count}",
+        anchor=MovementPatterns.CENTER,
+        text=f"Entered count: {standing_count}",
         fill="#292643",
         font=("LaoSansPro", 12),
         tags="count_text"
@@ -151,14 +151,14 @@ def display_traffic_counts():
     canvas.create_text(
         350.0,  # Set x coordinate
         430.0,  # Set y coordinate for exiting count
-        anchor=tk.CENTER,
+        anchor=MovementPatterns.CENTER,
         text=f"Exiting count: {exiting_count}",
         fill="#292643",
         font=("LaoSansPro", 12),
         tags="count_text"
     )
 
-window = tk.Tk()
+window = MovementPatterns.Tk()
 
 window.geometry("700x550")
 window.configure(bg="#BBAAB8")
