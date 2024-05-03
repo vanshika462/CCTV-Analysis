@@ -5,6 +5,9 @@ from PIL import Image, ImageTk
 from pathlib import Path
 import cv2
 from traffic import *
+import time
+import os
+import threading
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame1")
@@ -21,12 +24,19 @@ video_path = None  # Global variable to hold the selected video path
 entering_count = None
 standing_count = None
 exiting_count = None
+csv_content = ""
 
 def play_video():
     global cap, video_path
     video_path = filedialog.askopenfilename(filetypes=[("Video Files", "*.mp4;*.avi")])
     if not video_path:
         return
+
+    cap = cv2.VideoCapture(video_path)
+    width, height = 441, 291  # Dimensions of image_1
+    x, y = 235.0, 18.0  # Coordinates of image_1
+    canvas.delete("video")  # Delete any existing video
+    canvas.delete("count_text")
 
     def update_video():
         ret, frame = cap.read()
@@ -40,10 +50,6 @@ def play_video():
         else:
             cap.release()
 
-    cap = cv2.VideoCapture(video_path)
-    width, height = 441, 291  # Dimensions of image_1
-    x, y = 235.0, 18.0  # Coordinates of image_1
-    canvas.delete("video")  # Delete any existing video
     ret, frame = cap.read()
     if ret:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -59,31 +65,65 @@ def play_video():
         canvas.image = photo  # To prevent garbage collection
         update_video()  # Start updating the video frames
 
-def find_patterns():
-    global video_path,entering_count,standing_count,exiting_count
+def button_2_command():
+    threading.Thread(target=find_patterns_and_display_csv).start()
+
+def find_patterns_and_display_csv():
+    global video_path, entering_count, standing_count, exiting_count, csv_content
     if video_path:
-        entering_count, standing_count, exiting_count=process_video(video_path)
+        # Extract the base name of the video file
+        video_name = os.path.splitext(os.path.basename(video_path))[0]
+        # Construct the CSV file path with the same name as the video file
+        csv_file_path = f"traffic_output/{video_name}.csv"
+        # Update image_2 frame with CSV content
+        if os.path.exists(csv_file_path):
+            # Find counts
+            entering_count, standing_count, exiting_count = analyze_single_file(csv_file_path)
+            # If the CSV file exists, read its content
+            with open(csv_file_path, "r") as file:
+                csv_content = file.read()
+        else:
+            # If the CSV file does not exist, analyze the video
+            entering_count, standing_count, exiting_count = process_video(video_path)
+            # Save the CSV content to the file
+            with open(csv_file_path, "r") as file:
+                csv_content = file.read()
     else:
         print("No video selected.")
+    display_csv_content()
 
-def display_traffic_counts():
-    global standing_count, exiting_count, entering_count
-
+def display_csv_content():
+    global csv_content
     # Load the traffic plot image as the background
     plot_path = ASSETS_PATH / "image_2.png"
     plot_image = Image.open(plot_path)
     photo = ImageTk.PhotoImage(plot_image)
 
-    # Display the image as the background
-    canvas.delete("video")  # Delete any existing video
     canvas.create_image(
         350.0,  # Set x coordinate
         428.0,  # Set y coordinate
         anchor=tk.CENTER,
         image=photo,
-        tags="image_2"
+        tags="count_text"
     )
     canvas.image = photo  # To prevent garbage collection
+
+    # Text for CSV content
+    canvas.create_text(
+        350.0,  # Set x coordinate
+        400.0,  # Set y coordinate for CSV content
+        anchor=tk.CENTER,
+        text=csv_content,
+        fill="#292643",
+        font=("LaoSansPro", 12),
+        tags="count_text"
+    )
+
+def display_traffic_counts():
+    global standing_count, exiting_count, entering_count
+
+    # Delete only the traffic count text, keeping the video display intact
+    canvas.delete("count_text")
 
     # Text for entering count
     canvas.create_text(
@@ -92,7 +132,8 @@ def display_traffic_counts():
         anchor=tk.CENTER,
         text=f"Entering count: {entering_count}",
         fill="#292643",
-        font=("LaoSansPro", 12)
+        font=("LaoSansPro", 12),
+        tags="count_text"
     )
 
     # Text for standing count
@@ -102,7 +143,8 @@ def display_traffic_counts():
         anchor=tk.CENTER,
         text=f"Standing count: {standing_count}",
         fill="#292643",
-        font=("LaoSansPro", 12)
+        font=("LaoSansPro", 12),
+        tags="count_text"
     )
 
     # Text for exiting count
@@ -112,12 +154,9 @@ def display_traffic_counts():
         anchor=tk.CENTER,
         text=f"Exiting count: {exiting_count}",
         fill="#292643",
-        font=("LaoSansPro", 12)
+        font=("LaoSansPro", 12),
+        tags="count_text"
     )
-
-    # Stop video if it's playing
-    stop_video()
-
 
 window = tk.Tk()
 
@@ -170,7 +209,7 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=find_patterns,
+    command=button_2_command,
     relief="flat"
 )
 button_2.place(

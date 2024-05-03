@@ -14,7 +14,7 @@ def open_script_4():
 
 def open_script_5():
     window.destroy()
-    subprocess.run(["python", str(OUTPUT_PATH / "gui_loitering.py")])  # Adjust the file name as needed
+    subprocess.run(["python", str(OUTPUT_PATH / "gui_daysummary.py")])  # Adjust the file name as needed
 
 def open_script_6():
     window.destroy()

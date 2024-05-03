@@ -19,7 +19,7 @@ def count_entering_exiting_people(df):
     return counts
 
 # Specify the folder containing CSV files
-input_folder = 'traffic_output'
+input_folder = 'traffic_output\Apr24'
 
 # Read CSV files into a DataFrame
 data = read_csv_files(input_folder)
@@ -45,8 +45,8 @@ plt.grid(True)
 plt.tight_layout()
 
 # Save the plot as an image
-output_path = r'C:\Users\vansh\Desktop\Projects\CCTV-Analysis\interface\assets\frame0'
+output_path = r'C:\Users\vansh\Desktop\Projects\CCTV-Analysis\assets\frame3'
 os.makedirs(output_path, exist_ok=True)  # Create the directory if it doesn't exist
-plt.savefig(os.path.join(output_path, 'traffic_plot.png'))
+plt.savefig(os.path.join(output_path, '2024-04-19.png'))
 
 plt.show()
