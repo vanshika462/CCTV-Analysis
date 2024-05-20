@@ -11,14 +11,14 @@ def analyze_single_file(file_path):
 
     # Count the number of people entering, standing, and exiting
     entering_count = df[df['Direction'] == 'entering'].shape[0]
-    standing_count = df[df['Direction'] == 'standing'].shape[0]
+    standing_count = df[df['Direction'] == 'entered'].shape[0]
     exiting_count = df[df['Direction'] == 'exiting'].shape[0]
 
     return entering_count, standing_count, exiting_count
 
 def process_video(video_path):
     cap = cv2.VideoCapture(video_path)
-    output_folder = "traffic_output"
+    output_folder = "traffic_output\Apr24"
 
     if not cap.isOpened():
         print(f"Error opening video file: {video_path}")
