@@ -36,10 +36,6 @@ def display_frame():
         selected_label.image = resized_photo
         selected_label.pack()
 
-        # # Create a label to display the result
-        # result_label = Label(selected_frame, text=f'The frame has {object_count} objects.', font=("Inter ExtraLight", 15), bg="#BBAAB8", fg="#FFFFFF")
-        # result_label.place(x=-0, y=30)
-
 
 def process_frame():
     global file_path
@@ -191,4 +187,5 @@ selected_frame.pack(side="right", padx=20, pady=20)
 
 window.resizable(False, False)
 window.mainloop()
+
 

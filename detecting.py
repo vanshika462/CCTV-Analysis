@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load YOLO model and class names
-net = cv2.dnn.readNet("C:\\Users\\WelCome\\CCTV-Analysis\\darknet\\yolov3.weights","C:\\Users\\WelCome\\CCTV-Analysis\\darknet\\cfg\\yolov3.cfg")
+net = cv2.dnn.readNet("darknet\yolov3.weights","darknet\cfg\yolov3.cfg")
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
 
